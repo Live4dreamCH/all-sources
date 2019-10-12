@@ -1,6 +1,6 @@
-import numpy
+from numpy import array, reciprocal, linalg
+from tkinter.filedialog import askopenfilename
 import tkinter as tk
-import tkinter.filedialog
 # import SchemDraw
 import xlrd
 
@@ -49,17 +49,17 @@ def fun(address):
         k = cf + 1
         v = sheet.cell(i, k).value
     # print('a=',a)
-    a = numpy.array(ap, dtype=float)  # 将多维列表转化为numpy库下的矩阵
+    a = array(ap, dtype=float)  # 将多维列表转化为numpy库下的矩阵
     if sheet.cell(rf, cf).value in ['r', 'R']:  # 取倒数，将电阻转化为电导
-        a = numpy.reciprocal(a)
+        a = reciprocal(a)
     print('A=', a)
     bp = []
     for sb in range(rf + 1, i):  # 从上到下读取电流源的值，并存储在列矩阵b中
         bp.append([sheet.cell(sb, ced + 1).value])
-    b = numpy.array(bp, dtype=float)
+    b = array(bp, dtype=float)
     print('B=', b)
     # 计算结点电压
-    x = numpy.linalg.solve(a, b)  # 求解线性方程组
+    x = linalg.solve(a, b)  # 求解线性方程组
     print('x=', x)
     lt.insert(tk.END, '各节点电压为：')
     for it in x:
@@ -77,30 +77,30 @@ def select_path():
     # 通过replace函数替换绝对文件地址中的/来使文件可被程序读取
     # 注意：\\转义后为\，所以\\\\转义后为\\
     path_ = path_.replace("/", "\\")
-    # path设置path_的值
-    path.set(path_)
+    path.set(path_)     # 将字符串path_赋值给path，在输入框中就会更新path的新值
     fun(path_)
 
 
+# 建立窗体
 win = tk.Tk()
 win.title('节点电压法')
-win.geometry('1000x600')
+win.geometry('400x300')
 path = tk.StringVar()
-# 输入框，标记，按键
-# tk.Label(win).grid(row=0, column=0,padx=120)
 
-# 输入框绑定变量path
+# 生成标签、输入框、按钮和复选栏
+null = tk.Label(win).grid(row=0, column=0, padx=30)     # 空元件，用于调整主要元件的位置
 et = tk.Entry(win, textvariable=path)
-et.pack(side='top')
-tk.Label(win, text="目标路径:").pack(anchor=et, side='left')
-tk.Button(win, text="路径选择", command=select_path).pack(anchor=et, side='right')
-
+et.grid(row=0, column=2)
+tk.Label(win, text="目标路径:").grid(row=0, column=1)
+tk.Button(win, text="路径选择", command=select_path).grid(row=0, column=3)
 lt = tk.Listbox(win)
-lt.pack(anchor=et, side='bottom')
-win.mainloop()
+lt.grid(row=1, column=2)
+
+win.mainloop()  # 不断刷新窗体，更新内容并保持窗体存在
 
 # 试验场
 # 不管是type还是isinstance，都不能用complex来识别所有数字
 # python变量名区分大小写
 # print('here')
+# str(500)将数字500转化为字符串‘500’
 # input()
